@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Calendula</string>
+    <string name="default_category">Прочие</string>
+    <string name="prev_period">Предыдущий период</string>
+    <string name="next_period">Следующий период</string>
+</resources>
