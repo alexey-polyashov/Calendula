@@ -3,4 +3,9 @@
     <string name="default_category">Прочие</string>
     <string name="prev_period">Предыдущий период</string>
     <string name="next_period">Следующий период</string>
+    <string name="period_year">Г</string>
+    <string name="period_week">Н</string>
+    <string name="period_month">М</string>
+    <string name="period_day">Д</string>
+    <string name="period_home">Текущий период</string>
 </resources>
