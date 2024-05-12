@@ -105,7 +105,9 @@ fun MainScreen() {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            ShowPeriodScope(appState, showScope, {})
+            ShowPeriodScope(appState, showScope, currentPeriod, currentLayout) {
+                currentPeriod = appState.curentPeriodPresentation
+            }
         }
     }
 }

@@ -6,22 +6,33 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
-sealed class EventsScope(var currentPeriod:LocalDate, val type:String) {
+sealed class EventsScope(var currentPeriod:LocalDate, val type:String): Cloneable {
 
-    var from:LocalDate
-    var to:LocalDate
+    public override fun clone() = super.clone() as EventsScope
+    var from:LocalDate = LocalDate.MIN
+        get() {return getStartDate(currentPeriod)}
+    var to:LocalDate = LocalDate.MAX
+        get() {return getFinishDate(currentPeriod)}
 
-    init{
-        from = currentPeriod.with(TemporalAdjusters.firstDayOfMonth())
-        to = currentPeriod.with(TemporalAdjusters.lastDayOfMonth())
+    open fun getStartDate(period:LocalDate):LocalDate{
+        return currentPeriod.with(TemporalAdjusters.firstDayOfMonth())
+    }
+    open fun getFinishDate(period:LocalDate):LocalDate{
+        return currentPeriod.with(TemporalAdjusters.lastDayOfMonth())
     }
 
     open fun nextPeriod(){
-        currentPeriod = LocalDate.from(currentPeriod).plusMonths(1)
+        currentPeriod = getNextPeriod()
+    }
+    open fun getNextPeriod():LocalDate{
+        return LocalDate.from(currentPeriod).plusMonths(1)
     }
 
     open fun prevPeriod(){
-        currentPeriod = LocalDate.from(currentPeriod).plusMonths(-1)
+        currentPeriod = getPrevPeriod()
+    }
+    open fun getPrevPeriod():LocalDate{
+        return LocalDate.from(currentPeriod).plusMonths(-1)
     }
 
     open fun getPeriodValue():String{
@@ -37,56 +48,63 @@ sealed class EventsScope(var currentPeriod:LocalDate, val type:String) {
     }
 
     class Year(currentPeriod:LocalDate = LocalDate.now()) :EventsScope(LocalDate.now(), "year"){
-        init {
-            from = currentPeriod.with(TemporalAdjusters.firstDayOfYear())
-            to = currentPeriod.with(TemporalAdjusters.lastDayOfYear())
-        }
+
         override fun getPeriodValue():String {
             val formatter = DateTimeFormatter.ofPattern("Год" + ", yyyy")
             return currentPeriod.format(formatter)
         }
-
-        override fun nextPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusYears(1)
+        override fun getStartDate(period:LocalDate):LocalDate{
+            return period.with(TemporalAdjusters.firstDayOfYear())
         }
-        override fun prevPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusYears(-1)
+        override fun getFinishDate(period:LocalDate):LocalDate{
+            return period.with(TemporalAdjusters.lastDayOfYear())
+        }
+
+        override fun getNextPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusYears(1)
+        }
+        override fun getPrevPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusYears(-1)
         }
     }
 
     class Week(currentPeriod:LocalDate = LocalDate.now()) :EventsScope(LocalDate.now(), "week"){
-        init {
-            from = currentPeriod.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            to = currentPeriod.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        override fun getStartDate(period:LocalDate):LocalDate{
+            return period.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        }
+        override fun getFinishDate(period:LocalDate):LocalDate{
+            return period.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
         }
         override fun getPeriodValue():String {
             val formatter = DateTimeFormatter.ofPattern(
                 "Неделя" + ", ww")
             return currentPeriod.format(formatter)
         }
-        override fun nextPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusWeeks(1)
+        override fun getNextPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusWeeks(1)
         }
-        override fun prevPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusWeeks(-1)
+        override fun getPrevPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusWeeks(-1)
         }
     }
 
     class Day(currentPeriod:LocalDate = LocalDate.now()) :EventsScope(LocalDate.now(), "day"){
-        init {
-            from = currentPeriod
-            to = currentPeriod
+        override fun getStartDate(period:LocalDate):LocalDate{
+            return period
+        }
+        override fun getFinishDate(period:LocalDate):LocalDate{
+            return period
         }
         override fun getPeriodValue():String {
             val formatter = DateTimeFormatter.ofPattern(
                  "dd-MMM-yyyy")
             return currentPeriod.format(formatter)
         }
-        override fun nextPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusDays(1)
+        override fun getNextPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusDays(1)
         }
-        override fun prevPeriod(){
-            currentPeriod = LocalDate.from(currentPeriod).plusDays(-1)
+        override fun getPrevPeriod():LocalDate{
+            return LocalDate.from(currentPeriod).plusDays(-1)
         }
     }
 
