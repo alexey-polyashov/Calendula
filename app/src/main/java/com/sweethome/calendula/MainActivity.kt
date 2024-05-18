@@ -1,6 +1,7 @@
 package com.sweethome.calendula
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -80,6 +81,7 @@ fun MainScreen() {
                     ) {
                         ShowTopAppBar(appState, currentPeriod, currentLayout, showScope
                         ) {
+//                            Log.d("debugmes","refresh")
                             currentPeriod = appState.curentPeriodPresentation
                             showScope = appState.showScope
                         }
@@ -105,7 +107,9 @@ fun MainScreen() {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+//            Log.d("debugmes","20 invoke ShowPeriodScope")
             ShowPeriodScope(appState, showScope, currentPeriod, currentLayout) {
+//                Log.d("debugmes","refresh ShowPeriodScope")
                 currentPeriod = appState.curentPeriodPresentation
             }
         }

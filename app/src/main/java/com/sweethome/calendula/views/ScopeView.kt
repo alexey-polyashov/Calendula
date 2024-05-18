@@ -1,18 +1,21 @@
 package com.sweethome.calendula.views
 
 import android.util.Log
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,10 +35,8 @@ import com.sweethome.calendula.models.EventsScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import com.sweethome.calendula.controllers.AppController
 import java.time.DayOfWeek
@@ -58,108 +59,117 @@ fun ShowPeriodScope(
     val screenWidthDp = config.screenWidthDp
     val screenWidth = with(LocalDensity.current) { screenWidthDp.dp.roundToPx() }
 
-    val listState = rememberLazyListState(1)
-    val coroutineScope = rememberCoroutineScope()
+    val listState = rememberScrollState(screenWidth)
+
+//    val coroutineScope = rememberCoroutineScope()
 
     val prevPeriod = appState.eventScope.clone()
     val nextPeriod = appState.eventScope.clone()
 
     prevPeriod.currentPeriod = appState.eventScope.getPrevPeriod()
     nextPeriod.currentPeriod = appState.eventScope.getNextPeriod()
-    Log.d("debugmes", "1 ShowPeriodScope, currentPeriod - ${currentPeriod.toString()}")
-    Log.d("debugmes", "1 ShowPeriodScope, nextPeriod - ${nextPeriod.currentPeriod.toString()}")
-    Log.d("debugmes", "1 ShowPeriodScope, prevPeriod - ${prevPeriod.currentPeriod.toString()}")
+//    Log.d("debugmes", "1 ShowPeriodScope, currentPeriod - ${currentPeriod.toString()}")
+//    Log.d("debugmes", "1 ShowPeriodScope, nextPeriod - ${nextPeriod.currentPeriod.toString()}")
+//    Log.d("debugmes", "1 ShowPeriodScope, prevPeriod - ${prevPeriod.currentPeriod.toString()}")
 
     val listOfPeriod: List<EventsScope> = listOf(prevPeriod, appState.eventScope, nextPeriod)
 
 
     if(showScope){
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-        ) {
-            LazyRow(
-                state = listState,
+//        Card(
+//            colors = CardDefaults.cardColors(
+//                containerColor = MaterialTheme.colorScheme.secondary,
+//                contentColor = MaterialTheme.colorScheme.onSecondary
+//                )
+//        ) {
+            Row(
+                modifier = Modifier.horizontalScroll(state=listState),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                items(listOfPeriod){
-                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
-                    DrawScopeGrid(it.from, appState, screenWidthDp)
-                    }
+                Card(){
+                    var it = listOfPeriod[0]
+//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
+                    DrawScopeGrid(it, it.from, appState, screenWidthDp)
                 }
-            }
+                Card(){
+                    var it = listOfPeriod[1]
+//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
+                    DrawScopeGrid(it, it.from, appState, screenWidthDp)
+                }
+                Card(){
+                    var it = listOfPeriod[2]
+//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
+                    DrawScopeGrid(it, it.from, appState, screenWidthDp)
+                }
+
+//            }
+        }
     }
 
     LaunchedEffect(listState.isScrollInProgress){
-        val isFirstItemScrolled = isFirstElementSemiShown(listState, screenWidth)
-        val isLastItemScrolled = isLastElementSemiShown(listState, screenWidth)
-        if (isFirstItemScrolled) {
-            AppController.getPrevPeriod(appState)
-            refresh()
-        }
-        if (isLastItemScrolled) {
-            AppController.getNextPeriod(appState)
-            refresh()
-        }
         if(!listState.isScrollInProgress) {
-            coroutineScope.launch { scrollToCurrent(listState) }
+//            Log.d("debugmes", "10 ShowPeriodScope, !listState.isScrollInProgress")
+            val isFirstItemScrolled = isFirstElementSemiShown(listState, screenWidth)
+            val isLastItemScrolled = isLastElementSemiShown(listState, screenWidth)
+            if (isFirstItemScrolled) {
+//            Log.d("debugmes", "10 ShowPeriodScope, isFirstItemScrolled - ${isLastItemScrolled}")
+                AppController.getPrevPeriod(appState)
+                refresh()
+                scrollToCurrent(listState, screenWidth)
+            }
+            if (isLastItemScrolled) {
+//            Log.d("debugmes", "10 ShowPeriodScope, isLastItemScrolled - ${isLastItemScrolled}")
+                AppController.getNextPeriod(appState)
+                refresh()
+                scrollToCurrent(listState, screenWidth)
+            }
+//            if (!listState.isScrollInProgress) {
+////            Log.d("debugmes", "10 ShowPeriodScope, isScrollInProgress - ${listState.isScrollInProgress}")
+//            }
+//            coroutineScope.launch {
+//            }
+            scrollToCurrent(listState, screenWidth)
         }
 
     }
 
 }
 
-suspend fun scrollToCurrent(listState:LazyListState){
-    listState.scrollToItem(1)
+suspend fun scrollToCurrent(listState:ScrollState, screenWidth: Int){
+//    Log.d("debugmes", "15 scrollToCurrent")
+//    listState.dispatchRawDelta(screenWidth.toFloat())
+    listState.scrollTo(screenWidth)
 }
 
 
-fun isFirstElementSemiShown(ls:LazyListState, screenWidth:Int): Boolean {
+fun isFirstElementSemiShown(ls: ScrollState, screenWidth:Int): Boolean {
 
     var result:Boolean = false
 
-    val visibleItemsInfo = ls.layoutInfo.visibleItemsInfo
+    val scrollPosition = ls.value
+//    Log.d("debugmes", "20 isFirstElementSemiShown, scrollPosition - ${scrollPosition}")
 
-    if (ls.layoutInfo.totalItemsCount == 0) {
-        result = false
-    } else {
-        val firstEl = visibleItemsInfo[0]
-        val isFirstVisible = firstEl.index==0
-        if(isFirstVisible)
-            result = (screenWidth - abs(firstEl.offset)>screenWidth/2)
-        else
-            result = false
-    }
+    result = if(abs(scrollPosition) < screenWidth/2) true else false
 
     return result
 }
 
-fun isLastElementSemiShown(ls:LazyListState, screenWidth:Int): Boolean {
+fun isLastElementSemiShown(ls:ScrollState, screenWidth:Int): Boolean {
 
     var result:Boolean = false
 
-    val visibleItemsInfo = ls.layoutInfo.visibleItemsInfo
+    val scrollPosition = ls.value
+//    Log.d("debugmes", "20 isLastElementSemiShown, scrollPosition - ${scrollPosition}")
 
-    if (ls.layoutInfo.totalItemsCount == 0) {
-        result = false
-    } else {
-        val LastEl = visibleItemsInfo.last()
-        val isFirstVisible = LastEl.index==(ls.layoutInfo.totalItemsCount-1)
-        if(isFirstVisible)
-            result = (screenWidth - abs(LastEl.offset)>screenWidth/2)
-        else
-            result = false
-    }
+    result = if(abs(scrollPosition) > screenWidth*1.5) true else false
 
     return result
+
 }
 
 @Composable
-fun DrawScopeGrid(currentPeriod: LocalDate, appState: AppState, screenWidthDp: Int){
-    val scope = appState.eventScope
-    Log.d("debugmes", "3 DrawScopeGrid, currentPeriod - ${currentPeriod.toString()}")
+fun DrawScopeGrid(scope: EventsScope, currentPeriod: LocalDate, appState: AppState, screenWidthDp: Int){
+//    Log.d("debugmes", "3 DrawScopeGrid, currentPeriod - ${scope.from.toString()}")
     when(scope){
         is EventsScope.Year -> ShowYearGrid(scope, currentPeriod, screenWidthDp)
         is EventsScope.Month -> ShowMonthGrid(scope, currentPeriod, screenWidthDp)
@@ -173,7 +183,7 @@ fun ShowDayGrid(scope: EventsScope.Day, currentPeriod: LocalDate, screenWidthDp:
     val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
     val from = scope.from.format(formatter)
     val to = scope.to.format(formatter)
-    Text(text= "It's a day scope for $from date")
+    Text(text= "It's a day scope for $from date", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
 }
 
 @Composable
@@ -181,23 +191,23 @@ fun ShowWeekGrid(scope: EventsScope.Week, currentPeriod: LocalDate, screenWidthD
     val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
     val from = scope.from.format(formatter)
     val to = scope.to.format(formatter)
-    Text(text= "It's a week scope for $from - $to dates")
+    Text(text= "It's a week scope for $from - $to dates", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
 }
 
 @Composable
 fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidthDp: Int) {
 
-    val formatter = DateTimeFormatter.ofPattern("yyyy, MMMM", Locale("ru"))
+    val formatter = DateTimeFormatter.ofPattern("MMM", Locale("ru"))
     val scopeStartDate = scope.from
     val scopeEndDate = scope.to
     var currentDate = LocalDate.now()
     //val state = rememberLazyGridState(1)
 
-    Log.d("debugmes", "4 ShowMonthGrid, currentPeriod - ${currentPeriod.toString()}")
+//    Log.d("debugmes", "4 ShowMonthGrid, currentPeriod - ${currentPeriod}")
 
     Column() {
 
-        Text(text = "MONTH ${scopeStartDate.format(formatter)} ")
+        Text(text = currentPeriod.format(formatter) , modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
@@ -295,7 +305,7 @@ fun ShowYearGrid(scope: EventsScope.Year, currentPeriod: LocalDate, screenWidthD
     val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
     val from = scope.from.format(formatter)
     val to = scope.to.format(formatter)
-    Text(text= "It's a year scope for $from - $to dates")
+    Text(text= "It's a year scope for $from - $to dates", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
 }
 
 data class DayOfScope(
