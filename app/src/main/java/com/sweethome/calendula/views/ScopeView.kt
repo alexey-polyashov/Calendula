@@ -1,6 +1,5 @@
 package com.sweethome.calendula.views
 
-import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,21 +16,18 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.sweethome.calendula.models.AppState
 import com.sweethome.calendula.models.CalendulaLayout
 import com.sweethome.calendula.models.EventsScope
-import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -61,73 +56,51 @@ fun ShowPeriodScope(
 
     val listState = rememberScrollState(screenWidth)
 
-//    val coroutineScope = rememberCoroutineScope()
-
     val prevPeriod = appState.eventScope.clone()
     val nextPeriod = appState.eventScope.clone()
 
     prevPeriod.currentPeriod = appState.eventScope.getPrevPeriod()
     nextPeriod.currentPeriod = appState.eventScope.getNextPeriod()
-//    Log.d("debugmes", "1 ShowPeriodScope, currentPeriod - ${currentPeriod.toString()}")
-//    Log.d("debugmes", "1 ShowPeriodScope, nextPeriod - ${nextPeriod.currentPeriod.toString()}")
-//    Log.d("debugmes", "1 ShowPeriodScope, prevPeriod - ${prevPeriod.currentPeriod.toString()}")
 
     val listOfPeriod: List<EventsScope> = listOf(prevPeriod, appState.eventScope, nextPeriod)
 
 
     if(showScope){
-//        Card(
-//            colors = CardDefaults.cardColors(
-//                containerColor = MaterialTheme.colorScheme.secondary,
-//                contentColor = MaterialTheme.colorScheme.onSecondary
-//                )
-//        ) {
             Row(
                 modifier = Modifier.horizontalScroll(state=listState),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Card(){
                     var it = listOfPeriod[0]
-//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
                     DrawScopeGrid(it, it.from, appState, screenWidthDp)
                 }
                 Card(){
                     var it = listOfPeriod[1]
-//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
                     DrawScopeGrid(it, it.from, appState, screenWidthDp)
                 }
                 Card(){
                     var it = listOfPeriod[2]
-//                    Log.d("debugmes", "2 ShowPeriodScope, it.from - ${it.from.toString()}")
                     DrawScopeGrid(it, it.from, appState, screenWidthDp)
                 }
 
-//            }
         }
     }
 
     LaunchedEffect(listState.isScrollInProgress){
+
         if(!listState.isScrollInProgress) {
-//            Log.d("debugmes", "10 ShowPeriodScope, !listState.isScrollInProgress")
             val isFirstItemScrolled = isFirstElementSemiShown(listState, screenWidth)
             val isLastItemScrolled = isLastElementSemiShown(listState, screenWidth)
             if (isFirstItemScrolled) {
-//            Log.d("debugmes", "10 ShowPeriodScope, isFirstItemScrolled - ${isLastItemScrolled}")
                 AppController.getPrevPeriod(appState)
                 refresh()
                 scrollToCurrent(listState, screenWidth)
             }
             if (isLastItemScrolled) {
-//            Log.d("debugmes", "10 ShowPeriodScope, isLastItemScrolled - ${isLastItemScrolled}")
                 AppController.getNextPeriod(appState)
                 refresh()
                 scrollToCurrent(listState, screenWidth)
             }
-//            if (!listState.isScrollInProgress) {
-////            Log.d("debugmes", "10 ShowPeriodScope, isScrollInProgress - ${listState.isScrollInProgress}")
-//            }
-//            coroutineScope.launch {
-//            }
             scrollToCurrent(listState, screenWidth)
         }
 
@@ -136,8 +109,6 @@ fun ShowPeriodScope(
 }
 
 suspend fun scrollToCurrent(listState:ScrollState, screenWidth: Int){
-//    Log.d("debugmes", "15 scrollToCurrent")
-//    listState.dispatchRawDelta(screenWidth.toFloat())
     listState.scrollTo(screenWidth)
 }
 
@@ -147,7 +118,6 @@ fun isFirstElementSemiShown(ls: ScrollState, screenWidth:Int): Boolean {
     var result:Boolean = false
 
     val scrollPosition = ls.value
-//    Log.d("debugmes", "20 isFirstElementSemiShown, scrollPosition - ${scrollPosition}")
 
     result = if(abs(scrollPosition) < screenWidth/2) true else false
 
@@ -159,7 +129,6 @@ fun isLastElementSemiShown(ls:ScrollState, screenWidth:Int): Boolean {
     var result:Boolean = false
 
     val scrollPosition = ls.value
-//    Log.d("debugmes", "20 isLastElementSemiShown, scrollPosition - ${scrollPosition}")
 
     result = if(abs(scrollPosition) > screenWidth*1.5) true else false
 
@@ -169,7 +138,6 @@ fun isLastElementSemiShown(ls:ScrollState, screenWidth:Int): Boolean {
 
 @Composable
 fun DrawScopeGrid(scope: EventsScope, currentPeriod: LocalDate, appState: AppState, screenWidthDp: Int){
-//    Log.d("debugmes", "3 DrawScopeGrid, currentPeriod - ${scope.from.toString()}")
     when(scope){
         is EventsScope.Year -> ShowYearGrid(scope, currentPeriod, screenWidthDp)
         is EventsScope.Month -> ShowMonthGrid(scope, currentPeriod, screenWidthDp)
@@ -182,28 +150,13 @@ fun DrawScopeGrid(scope: EventsScope, currentPeriod: LocalDate, appState: AppSta
 fun ShowDayGrid(scope: EventsScope.Day, currentPeriod: LocalDate, screenWidthDp: Int) {
     val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
     val from = scope.from.format(formatter)
-    val to = scope.to.format(formatter)
-    Text(text= "It's a day scope for $from date", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
+    Text(text= currentPeriod.format(formatter), modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
 }
 
 @Composable
 fun ShowWeekGrid(scope: EventsScope.Week, currentPeriod: LocalDate, screenWidthDp: Int) {
-    val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
-    val from = scope.from.format(formatter)
-    val to = scope.to.format(formatter)
-    Text(text= "It's a week scope for $from - $to dates", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
-}
 
-@Composable
-fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidthDp: Int) {
-
-    val formatter = DateTimeFormatter.ofPattern("MMM", Locale("ru"))
-    val scopeStartDate = scope.from
-    val scopeEndDate = scope.to
-    var currentDate = LocalDate.now()
-    //val state = rememberLazyGridState(1)
-
-//    Log.d("debugmes", "4 ShowMonthGrid, currentPeriod - ${currentPeriod}")
+    var formatter = DateTimeFormatter.ofPattern("MMMM-yyyy", Locale("ru"))
 
     Column() {
 
@@ -211,10 +164,126 @@ fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidt
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            modifier = Modifier.width(screenWidthDp.dp),
+            modifier = Modifier.width(screenWidthDp.dp)
+                .background(MaterialTheme.colorScheme.secondary),
+        ) {
+
+            formatter = DateTimeFormatter.ofPattern("E", Locale("ru"))
+            var daysCounter = scope.from
+            val currentDay = LocalDate.now()
+            val lastDayOfScope = scope.to
+            val weekDaysList = listOf(
+                daysCounter.format(formatter),
+                daysCounter.plusDays(1).format(formatter),
+                daysCounter.plusDays(2).format(formatter),
+                daysCounter.plusDays(3).format(formatter),
+                daysCounter.plusDays(4).format(formatter),
+                daysCounter.plusDays(5).format(formatter),
+                daysCounter.plusDays(6).format(formatter),
+            )
+            items(weekDaysList) {
+                Box(
+                    modifier = Modifier.width((screenWidthDp / 7).dp)
+                        .height((screenWidthDp / 14).dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = AnnotatedString(it),
+                        color = if (weekDaysList.indexOf(it) > 4) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onSecondary,
+                    )
+                }
+            }
+
+            formatter = DateTimeFormatter.ofPattern("dd", Locale("ru"))
+            val daysList: MutableList<CheapOfScope> = mutableListOf()
+            while (daysCounter <= lastDayOfScope) {
+                val dayOfScope = CheapOfScope(
+                    date = daysCounter,
+                    dateAsString = daysCounter.format(formatter),
+                    isCurrent = daysCounter == currentDay,
+                    isBusy = daysCounter == currentDay,
+                    isSpecial = if(daysCounter.dayOfWeek==DayOfWeek.SUNDAY || daysCounter.dayOfWeek==DayOfWeek.SATURDAY) true else false
+                )
+                daysList.add(dayOfScope)
+                daysCounter = daysCounter.plusDays(1)
+            }
+            items(daysList) {
+
+                val dayColor = if (it.isSpecial) MaterialTheme.colorScheme.errorContainer
+                                else MaterialTheme.colorScheme.onSecondary
+
+                val cellColor = if(it.isCurrent) MaterialTheme.colorScheme.secondaryContainer
+                                else MaterialTheme.colorScheme.secondary
+
+                val mod = if(it.isCurrent) {
+                    Modifier.width((screenWidthDp / 7).dp)
+                        .height((screenWidthDp / 10).dp)
+                        .shadow(
+                            elevation = 5.dp,
+                            shape = RoundedCornerShape(7.dp)
+                        )
+                        .background(cellColor)
+                }
+                else {
+                    Modifier.width((screenWidthDp / 7).dp)
+                        .height((screenWidthDp / 10).dp)
+                        .background(cellColor)
+                }
+
+                Box(
+                    modifier = mod,
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Text(
+                        text = it.dateAsString,
+                        color = dayColor,
+                        textAlign = TextAlign.Center
+                    )
+                    if(it.isBusy) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(0.7f)
+                            //.background(MaterialTheme.colorScheme.primaryContainer)
+                            ,
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Text(
+                                text = ".",
+                                textAlign = TextAlign.End,
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                modifier = Modifier.fillMaxSize(),
+                                fontSize = 5.em,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidthDp: Int) {
+
+    var formatter = DateTimeFormatter.ofPattern("MMMM", Locale("ru"))
+    val scopeStartDate = scope.from
+    val scopeEndDate = scope.to
+    var currentDate = LocalDate.now()
+
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)) {
+
+        Text(text = transformNameOfMonth(currentPeriod.format(formatter)) , modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            modifier = Modifier.width(screenWidthDp.dp)
+                .background(MaterialTheme.colorScheme.secondary),
             //state = rememberLazyGridState()
         ) {
-            var formatter = DateTimeFormatter.ofPattern("E", Locale("ru"))
+            formatter = DateTimeFormatter.ofPattern("E", Locale("ru"))
             var daysCounter = scope.from.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             val lastDayOfScope = scope.to.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
             val weekDaysList = listOf(
@@ -235,15 +304,14 @@ fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidt
                     Text(
                         text = AnnotatedString(it),
                         color = if (weekDaysList.indexOf(it) > 4) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.onSecondary,
-                        //modifier = Modifier.fillMaxSize()
                     )
                 }
             }
 
             formatter = DateTimeFormatter.ofPattern("dd", Locale("ru"))
-            var daysList: MutableList<DayOfScope> = mutableListOf()
+            val daysList: MutableList<CheapOfScope> = mutableListOf()
             while (daysCounter <= lastDayOfScope) {
-                val dayOfScope = DayOfScope(
+                val dayOfScope = CheapOfScope(
                     date = daysCounter,
                     dateAsString = daysCounter.format(formatter),
                     isCurrent = currentDate == daysCounter,
@@ -256,18 +324,30 @@ fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidt
             }
             items(daysList) {
 
-                val dayColor = if(it.outOfRange) MaterialTheme.colorScheme.background
+                val dayColor = if(it.outOfRange) MaterialTheme.colorScheme.outline
                                 else if (it.isSpecial) MaterialTheme.colorScheme.errorContainer
                                 else MaterialTheme.colorScheme.onSecondary
 
                 val cellColor = if(it.isCurrent) MaterialTheme.colorScheme.secondaryContainer
                                 else MaterialTheme.colorScheme.secondary
 
+                val mod = if(it.isCurrent) {
+                        Modifier.width((screenWidthDp / 7).dp)
+                            .height((screenWidthDp / 10).dp)
+                            .shadow(
+                                elevation = 5.dp,
+                                shape = RoundedCornerShape(7.dp)
+                            )
+                            .background(cellColor)
+                    }
+                    else {
+                        Modifier.width((screenWidthDp / 7).dp)
+                            .height((screenWidthDp / 10).dp)
+                            .background(cellColor)
+                    }
+
                 Box(
-                    modifier = Modifier.width((screenWidthDp / 7).dp)
-                        .height((screenWidthDp / 10).dp)
-                        .background(cellColor)
-                        .clip(RoundedCornerShape(10.dp)),
+                    modifier = mod,
                     contentAlignment = Alignment.Center
 
                 ) {
@@ -279,8 +359,7 @@ fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidt
                     if(it.isBusy) {
                         Box(
                             modifier = Modifier.fillMaxSize(0.7f)
-                                //.background(MaterialTheme.colorScheme.primaryContainer)
-                            ,
+                                ,
                             contentAlignment = Alignment.BottomEnd
                         ) {
                             Text(
@@ -302,16 +381,126 @@ fun ShowMonthGrid(scope: EventsScope.Month, currentPeriod: LocalDate, screenWidt
 
 @Composable
 fun ShowYearGrid(scope: EventsScope.Year, currentPeriod: LocalDate, screenWidthDp: Int) {
-    val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy", Locale("ru"))
-    val from = scope.from.format(formatter)
-    val to = scope.to.format(formatter)
-    Text(text= "It's a year scope for $from - $to dates", modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
+
+    var formatter = DateTimeFormatter.ofPattern("yyyy", Locale("ru"))
+
+    Column() {
+
+        Text(text = currentPeriod.format(formatter) , modifier = Modifier.width(screenWidthDp.dp).padding(10.dp, 0.dp, 0.dp, 0.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier.width(screenWidthDp.dp)
+                .background(MaterialTheme.colorScheme.secondary),
+        ) {
+            formatter = DateTimeFormatter.ofPattern("MMMM", Locale("ru"))
+            var daysCounter = scope.from
+            var currentMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth())
+            val lastDayOfScope = scope.to
+
+            formatter = DateTimeFormatter.ofPattern("MMMM", Locale("ru"))
+            var monthsList: MutableList<CheapOfScope> = mutableListOf()
+            while (daysCounter <= lastDayOfScope) {
+                val dayOfScope = CheapOfScope(
+                    date = daysCounter,
+                    startDate = daysCounter.with(TemporalAdjusters.firstDayOfMonth()),
+                    endDate = daysCounter.with(TemporalAdjusters.lastDayOfMonth()),
+                    dateAsString = transformNameOfMonth(daysCounter.format(formatter)),
+                    isCurrent = daysCounter.with(TemporalAdjusters.firstDayOfMonth()) == currentMonth,
+                    isBusy = daysCounter.with(TemporalAdjusters.firstDayOfMonth()) == currentMonth,
+                    isSpecial = false
+                )
+                monthsList.add(dayOfScope)
+                daysCounter = daysCounter.plusMonths(1)
+            }
+            items(monthsList) {
+
+                val monthColor = MaterialTheme.colorScheme.onSecondary
+
+                val cellColor = if(it.isCurrent) MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.secondary
+
+                val mod = if(it.isCurrent) {
+                    Modifier.width((screenWidthDp / 7).dp)
+                        .height((screenWidthDp / 10).dp)
+                        .shadow(
+                            elevation = 5.dp,
+                            shape = RoundedCornerShape(7.dp)
+                        )
+                        .background(cellColor)
+                }
+                else {
+                    Modifier.width((screenWidthDp / 7).dp)
+                        .height((screenWidthDp / 10).dp)
+                        .background(cellColor)
+                }
+
+                Box(
+                    modifier = mod,
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Text(
+                        text = it.dateAsString,
+                        color = monthColor,
+                        textAlign = TextAlign.Center
+                    )
+                    if(it.isBusy) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(0.7f)
+                            //.background(MaterialTheme.colorScheme.primaryContainer)
+                            ,
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Text(
+                                text = ".",
+                                textAlign = TextAlign.End,
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                modifier = Modifier.fillMaxSize(),
+                                fontSize = 5.em,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
 }
 
-data class DayOfScope(
+data class CheapOfScope(
     val date:LocalDate,
+    val startDate:LocalDate = date,
+    val endDate:LocalDate = date,
     val dateAsString:String,
     val isSpecial:Boolean,
     val isCurrent:Boolean,
     val isBusy:Boolean,
-    val outOfRange:Boolean)
+    val outOfRange:Boolean = false)
+
+fun transformNameOfMonth(month:String):String{
+
+    var result:String
+
+    val transformMap: Map<String, String> = mapOf(
+        Pair("января",      "Январь"),
+        Pair("февраля",     "Февраль"),
+        Pair("марта",       "Март"),
+        Pair("апреля",      "Апрель"),
+        Pair("мая",         "Май"),
+        Pair("июня",        "Июнь"),
+        Pair("июля",        "Июль"),
+        Pair("августа",     "Август"),
+        Pair("сентября",    "Сентябрь"),
+        Pair("октября",     "Октябрь"),
+        Pair("ноября",      "Ноябрь"),
+        Pair("декабря",     "Декабрь")
+    )
+
+    result = transformMap.get(month.lowercase())?:month
+
+    return result
+
+}
