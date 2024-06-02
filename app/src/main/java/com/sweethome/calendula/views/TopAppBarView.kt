@@ -11,14 +11,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.sweethome.calendula.R
 import com.sweethome.calendula.controllers.AppController
-import com.sweethome.calendula.models.AppState
+import com.sweethome.calendula.datalayer.AppStateData
 import com.sweethome.calendula.models.CalendulaLayout
 import com.sweethome.calendula.models.EventsScope
 
@@ -26,7 +25,7 @@ import com.sweethome.calendula.models.EventsScope
 
 @Composable
 fun ShowTopAppBar(
-    appState: AppState,
+    appState: AppStateData,
     currentPeriod: String,
     currentLayout: CalendulaLayout,
     showScope: Boolean,

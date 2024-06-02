@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.sweethome.calendula.models.AppState
+import com.sweethome.calendula.datalayer.AppStateData
 import com.sweethome.calendula.models.CalendulaLayout
 import com.sweethome.calendula.models.EventsScope
 import androidx.compose.ui.platform.LocalDensity
@@ -43,7 +43,7 @@ import kotlin.math.abs
 
 @Composable
 fun ShowPeriodScope(
-    appState: AppState,
+    appState: AppStateData,
     showScope: Boolean,
     currentPeriod: String,
     currentLayout: CalendulaLayout,
@@ -137,7 +137,7 @@ fun isLastElementSemiShown(ls:ScrollState, screenWidth:Int): Boolean {
 }
 
 @Composable
-fun DrawScopeGrid(scope: EventsScope, currentPeriod: LocalDate, appState: AppState, screenWidthDp: Int){
+fun DrawScopeGrid(scope: EventsScope, currentPeriod: LocalDate, appState: AppStateData, screenWidthDp: Int){
     when(scope){
         is EventsScope.Year -> ShowYearGrid(scope, currentPeriod, screenWidthDp)
         is EventsScope.Month -> ShowMonthGrid(scope, currentPeriod, screenWidthDp)

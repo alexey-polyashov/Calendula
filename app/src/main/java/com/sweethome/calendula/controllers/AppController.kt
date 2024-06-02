@@ -1,6 +1,6 @@
 package com.sweethome.calendula.controllers
 
-import com.sweethome.calendula.models.AppState
+import com.sweethome.calendula.datalayer.AppStateData
 import com.sweethome.calendula.models.EventsScope
 import java.time.LocalDate
 
@@ -9,27 +9,27 @@ class AppController {
     companion object {
 
         //TopAppBar events
-        val getPrevPeriod: (appState: AppState) -> Unit = {
+        val getPrevPeriod: (appState: AppStateData) -> Unit = {
             it.eventScope.prevPeriod()
             it.setPeriod(it.eventScope.currentPeriod)
         }
 
-        val selectPeriod: (appState: AppState) -> Unit = {
-            appState: AppState ->
+        val selectPeriod: (appState: AppStateData) -> Unit = {
+            appState: AppStateData ->
                 {}
         }
 
-        val getNextPeriod: (appState: AppState) -> Unit = {
+        val getNextPeriod: (appState: AppStateData) -> Unit = {
             it.eventScope.nextPeriod()
             it.setPeriod(it.eventScope.currentPeriod)
         }
 
-        val homePeriod: (appState: AppState) -> Unit = {
+        val homePeriod: (appState: AppStateData) -> Unit = {
             it.eventScope.currentPeriod = LocalDate.now()
             it.setPeriod(it.eventScope.currentPeriod)
         }
 
-        val selectScope: (appState: AppState) -> Unit = {
+        val selectScope: (appState: AppStateData) -> Unit = {
             it.eventScope = when(it.eventScope){
                 is EventsScope.Day -> {
                     EventsScope.Year()
@@ -47,7 +47,7 @@ class AppController {
             it.refresh()
         }
 
-        val showHideScope: (appState: AppState) -> Unit = {
+        val showHideScope: (appState: AppStateData) -> Unit = {
             it.showScope = !it.showScope
         }
 

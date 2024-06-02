@@ -1,7 +1,6 @@
 package com.sweethome.calendula
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sweethome.calendula.datalayer.AppStateData
+import com.sweethome.calendula.models.AppState
 import com.sweethome.calendula.ui.theme.CalendulaTheme
 import com.sweethome.calendula.views.ShowPeriodScope
 import com.sweethome.calendula.views.ShowTopAppBar
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
 
 //    val context = LocalContext.current
-    val appState = AppStateData.getState()
+    val appState = AppState.getState()
     var currentPeriod by remember {mutableStateOf(appState.curentPeriodPresentation)}
     var currentLayout by remember { mutableStateOf(appState.currentLayout) }
     var showScope by remember { mutableStateOf(appState.showScope) }
